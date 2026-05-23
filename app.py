@@ -6,7 +6,7 @@ from docxtpl import DocxTemplate
 import streamlit.components.v1 as components  # <-- NUEVO: Para el confeti y el sonido
 
 # 1. CONFIGURACIÓN DE PÁGINA
-st.set_page_config(page_title="UltraVET | Informes", page_icon="🩺", layout="centered")
+st.set_page_config(page_title="UltraVET | Informes", page_icon="logo_ultravet.png", layout="centered")
 
 # 2. COLORES Y ESTILOS "ULTRA-VET PREMIUM" (CSS)
 st.markdown("""
