@@ -101,8 +101,8 @@ with st.sidebar:
     st.markdown("<small>UltraVet © 2026<br>Diseñado por: Santiago Grefa</small>", unsafe_allow_html=True)
 
 # 4. CUERPO PRINCIPAL
-st.markdown("<h1 style='text-align: center;'>Panel de Imagenología Móvil</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #576574;'>Automatización inteligente para informes ecográficos de alta precisión.</p>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>Imagenología Móvil - Informes ecográficos</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #576574;'>Bienvenid@, por favor rellena los datos para continuar con el informe.</p>", unsafe_allow_html=True)
 
 st.write("---")
 
