@@ -3,30 +3,22 @@ import google.generativeai as genai
 import io
 import re
 from docxtpl import DocxTemplate
+import streamlit.components.v1 as components  # <-- NUEVO: Para el confeti y el sonido
 
-# 1. CONFIGURACIÓN DE PÁGINA (Aesthetic Mode)
-st.set_page_config(
-    page_title="UltraVET | Informes", 
-    page_icon="🩺", 
-    layout="centered"
-)
+# 1. CONFIGURACIÓN DE PÁGINA
+st.set_page_config(page_title="UltraVET | Informes", page_icon="🩺", layout="centered")
 
 # 2. COLORES Y ESTILOS "ULTRA-VET PREMIUM" (CSS)
 st.markdown("""
     <style>
-    /* Importar fuente moderna */
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600&display=swap');
     
     html, body, [class*="css"] {
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
-
-    /* Fondo general con un degradado sutil */
     .stApp {
         background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     }
-
-    /* Tarjetas tipo Cristal (Glassmorphism) */
     div[data-testid="stVerticalBlock"] > div:has(div.stRadio), .stTextArea, .stFileUploader {
         background: rgba(255, 255, 255, 0.7);
         backdrop-filter: blur(10px);
@@ -35,8 +27,6 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.3);
         box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
     }
-
-    /* Botón Principal Estilo Apple/Aesthetic */
     div.stButton > button:first-child {
         background: linear-gradient(135deg, #007682 0%, #004e56 100%);
         color: white;
@@ -54,34 +44,24 @@ st.markdown("""
         box-shadow: 0 8px 25px rgba(0, 118, 130, 0.4);
         color: #e0e0e0;
     }
-
-    /* Estilo para los títulos */
     h1 {
         color: #003049;
         font-weight: 700 !important;
         letter-spacing: -1px;
     }
-    
-    /* Personalizar el sidebar: OBLIGAR a que TODO el texto sea blanco */
     [data-testid="stSidebar"] {
         background-color: #003049;
     }
-    [data-testid="stSidebar"] h1, 
-    [data-testid="stSidebar"] h2, 
-    [data-testid="stSidebar"] h3, 
-    [data-testid="stSidebar"] h4, 
-    [data-testid="stSidebar"] p, 
-    [data-testid="stSidebar"] span, 
-    [data-testid="stSidebar"] small,
-    [data-testid="stSidebar"] label {
+    [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3, 
+    [data-testid="stSidebar"] h4, [data-testid="stSidebar"] p, [data-testid="stSidebar"] span, 
+    [data-testid="stSidebar"] small, [data-testid="stSidebar"] label {
         color: #ffffff !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# 3. BARRA LATERAL (Sidebar Profesional)
+# 3. BARRA LATERAL
 with st.sidebar:
-    # Usamos st.image con el logo que subiste a GitHub
     try:
         st.image("logo_ultravet.png", width=220)
     except:
@@ -101,12 +81,10 @@ with st.sidebar:
     st.markdown("<small>UltraVet © 2026<br>Diseñado por: Santiago Grefa</small>", unsafe_allow_html=True)
 
 # 4. CUERPO PRINCIPAL
-st.markdown("<h1 style='text-align: center;'>Imagenología Móvil - Informes ecográficos</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #576574;'>Bienvenid@, por favor rellena los datos para continuar con el informe.</p>", unsafe_allow_html=True)
-
+st.markdown("<h1 style='text-align: center;'>Panel de Imagenología Móvil</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #576574;'>Bienvenid@, por favor ingresa los datos necesarios para desarrollar el informe.</p>", unsafe_allow_html=True)
 st.write("---")
 
-# Selección de entrada estética
 col1, col2 = st.columns([1, 1])
 with col1:
     st.markdown("### 🧬 Entrada de Datos")
@@ -122,7 +100,6 @@ else:
 
 st.write("")
 
-# 5. LÓGICA DE PROCESAMIENTO (Mantenemos la que ya funciona)
 prompt_maestro = """
 Extrae la información médica del caso y devuélvela ESTRICTAMENTE en el siguiente formato de lista. 
 No añadas ningún texto extra antes ni después. Si un órgano no se menciona, escribe "Arquitectura conservada sin alteraciones evidentes".
@@ -162,7 +139,6 @@ def extraer_datos_ia(texto_ia):
         datos[clave.lower()] = match.group(1).strip() if match else ""
     return datos
 
-# Botón con efecto
 if st.button("✨ PROCESAR INFORME CLÍNICO"):
     if not API_KEY:
         st.error("🔑 Error: Ingresa la API Key en el menú lateral.")
@@ -187,7 +163,6 @@ if st.button("✨ PROCESAR INFORME CLÍNICO"):
                 texto_ia = respuesta.text
                 contexto_datos = extraer_datos_ia(texto_ia)
                 
-                # Inyección en Word
                 doc = DocxTemplate("plantilla.docx")
                 doc.render(contexto_datos)
                 
@@ -195,11 +170,49 @@ if st.button("✨ PROCESAR INFORME CLÍNICO"):
                 doc.save(buffer)
                 buffer.seek(0)
                 
-                # Feedback visual Premium
-                st.toast("🧬 Análisis completo", icon="✅")
-                st.balloons()
-                
                 st.success("### ✅ Informe Generado Correctamente")
+                
+                # --- NUEVO EFECTO: Confeti Sutil y Sonido ---
+                st.toast("Documento estructurado con éxito", icon="✔️")
+                components.html(
+                    """
+                    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+                    <script>
+                        // Sonido de Visto/Check suave
+                        var audio = new Audio('https://upload.wikimedia.org/wikipedia/commons/3/34/Sound_Effect_-_Ping_Ding.ogg');
+                        audio.volume = 0.5;
+                        audio.play().catch(e => console.log("Audio silenciado por el navegador"));
+
+                        // Animación de confeti desde las esquinas inferiores
+                        var duration = 1.5 * 1000;
+                        var end = Date.now() + duration;
+                        var colors = ['#007682', '#003049']; // Colores institucionales
+
+                        (function frame() {
+                            confetti({
+                                particleCount: 4,
+                                angle: 60,
+                                spread: 55,
+                                origin: { x: 0, y: 1 },
+                                colors: colors
+                            });
+                            confetti({
+                                particleCount: 4,
+                                angle: 120,
+                                spread: 55,
+                                origin: { x: 1, y: 1 },
+                                colors: colors
+                            });
+                            if (Date.now() < end) {
+                                requestAnimationFrame(frame);
+                            }
+                        }());
+                    </script>
+                    """,
+                    height=0, width=0
+                )
+                # ----------------------------------------------
+                
                 st.download_button(
                     label="📥 DESCARGAR REPORTE OFICIAL (.DOCX)",
                     data=buffer,
