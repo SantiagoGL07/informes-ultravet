@@ -62,11 +62,18 @@ st.markdown("""
         letter-spacing: -1px;
     }
     
-    /* Personalizar el sidebar */
+    /* Personalizar el sidebar: OBLIGAR a que TODO el texto sea blanco */
     [data-testid="stSidebar"] {
         background-color: #003049;
     }
-    [data-testid="stSidebar"] h3, [data-testid="stSidebar"] p, [data-testid="stSidebar"] small {
+    [data-testid="stSidebar"] h1, 
+    [data-testid="stSidebar"] h2, 
+    [data-testid="stSidebar"] h3, 
+    [data-testid="stSidebar"] h4, 
+    [data-testid="stSidebar"] p, 
+    [data-testid="stSidebar"] span, 
+    [data-testid="stSidebar"] small,
+    [data-testid="stSidebar"] label {
         color: #ffffff !important;
     }
     </style>
