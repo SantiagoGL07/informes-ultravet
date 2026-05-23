@@ -6,7 +6,7 @@ from docxtpl import DocxTemplate
 
 # 1. CONFIGURACIÓN DE PÁGINA (Aesthetic Mode)
 st.set_page_config(
-    page_title="UltraVET | Inteligencia Artificial", 
+    page_title="UltraVET | Informes", 
     page_icon="🩺", 
     layout="centered"
 )
@@ -91,7 +91,7 @@ with st.sidebar:
         st.warning("Esperando Credenciales...")
     
     st.divider()
-    st.markdown("<small>Versión 2.0 - UltraVet © 2024<br>Diseño Aesthetic & Pro</small>", unsafe_allow_html=True)
+    st.markdown("<small>UltraVet © 2026<br>Diseñado por: Santiago Grefa</small>", unsafe_allow_html=True)
 
 # 4. CUERPO PRINCIPAL
 st.markdown("<h1 style='text-align: center;'>Panel de Imagenología Móvil</h1>", unsafe_allow_html=True)
