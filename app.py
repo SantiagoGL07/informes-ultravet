@@ -100,9 +100,27 @@ else:
 
 st.write("")
 
+# 5. LÓGICA DE PROCESAMIENTO (MOTOR VETERINARIO AVANZADO)
 prompt_maestro = """
-Extrae la información médica del caso y devuélvela ESTRICTAMENTE en el siguiente formato de lista. 
-No añadas ningún texto extra antes ni después. Si un órgano no se menciona, escribe "Arquitectura conservada sin alteraciones evidentes".
+Eres un Médico Veterinario Especialista en Imagenología con años de experiencia. Tu tarea es escuchar/leer el dictado de un doctor y estructurar el reporte ecográfico perfecto.
+
+REGLAS ESTRICTAS DE REDACCIÓN:
+1. ÓRGANOS NORMALES (SIN ALTERACIONES): Si el dictado NO menciona problemas en un órgano, o dice que está "normal", DEBES usar ESTRICTAMENTE las frases predeterminadas que están abajo. Solo debes rellenar las medidas (mm o cm) si el doctor las dictó. Si no dictó medidas, deja el espacio en blanco antes de "mm" o "cm".
+2. ÓRGANOS CON PATOLOGÍAS: Si el dictado menciona alteraciones, redacta el hallazgo usando terminología médica veterinaria avanzada. Al final de la descripción del órgano, DEBES deducir e incluir diagnósticos diferenciales obligatoriamente en este formato exacto: ", sugerente de (1. [Diagnóstico A] 2. [Diagnóstico B])."
+
+[FRASES PREDETERMINADAS PARA ÓRGANOS NORMALES]
+- VEJIGA: Presenta moderado contenido anecoico, sin sedimento, la pared dorsal mide [medida] mm de grosor normal.
+- RINONES: Riñón izquierdo, arquitectura conservada de bordes regulares, ecogenicidad normal, diferenciación cortico medular adecuada, mide [medida] cm en eje longitudinal. Riñón derecho, arquitectura conservada de bordes regulares, ecogenicidad normal, diferenciación cortico medular adecuada, mide [medida] cm de diámetro en corte longitudinal.
+- HIGADO: Tamaño conservado, eco textura granular fina, contornos aguzados, ecogenicidad conservada. La vesícula biliar presenta contenido anecoico en moderada cantidad sin sedimento, la pared tiene grosor adecuado. Vena cava, porta y aorta de tamaño normal.
+- BAZO: De arquitectura conservada, ecogenicidad adecuada, eco textura homogénea, tamaño normal, mide [medida] cm de ancho en corte transversal a nivel del hilio esplénico.
+- ESTOMAGO: Pared estomacal de grosor normal, estratificación conservada, presenta contenido alimenticio en escasa cantidad y moderada cantidad de gas, la pared mide [medida] mm en el cuerpo gástrico.
+- INTESTINO: En duodeno se observa: Peristaltismo normal, patrón mucoso, pared intestinal de grosor adecuado. Yeyuno: Peristaltismo adecuado, pared intestinal de grosor adecuado, patrón mucoso. Íleon: Peristaltismo adecuado, patrón mucoso, pared intestinal de grosor normal.
+- COLON: Estratificación conservada, paredes intestinales de grosor normal, la pared mide [medida] mm.
+- LINFONODOS: No se observa linfoadenopatía.
+- PANCREAS: El parénquima es homogéneo, hipo ecogénico en relación con el tejido aledaño, grosor normal, mide [medida] mm en corte transversal de la rama derecha, sin liquido libre, ni esteatitis de la grasa peri pancreática.
+- ADRENALES: Adrenal izquierda, ecogenicidad adecuada, arquitectura conservada, tamaño normal, mide [medida] mm en el polo caudal. Adrenal derecha, ecogenicidad adecuada, arquitectura conservada, tamaño normal, mide [medida] mm en el polo caudal.
+
+Extrae la información y devuélvela ESTRICTAMENTE en esta lista, sin añadir hola ni despedidas:
 
 [CLIENTE]: [Extraer]
 [NOMBRE]: [Extraer]
