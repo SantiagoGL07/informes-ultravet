@@ -2,7 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 import io
 import re
-from docxtpl import DocxTemplate
+from docxtpl import DocxTemplate, RichText
 import streamlit.components.v1 as components  # <-- NUEVO: Para el confeti y el sonido
 
 # 1. CONFIGURACIÓN DE PÁGINA
@@ -156,14 +156,34 @@ def extraer_datos_ia(texto_ia):
     datos = {}
     claves_mayusculas = ["CLIENTE", "NOMBRE", "EDAD", "ESPECIE", "RAZA", "SEXO", "NHC", "MEDICO", "CENTRO", "REGION"]
     claves_normales = ["VEJIGA", "RINONES", "HIGADO", "BAZO", "ESTOMAGO", "INTESTINO", "COLON", "LINFONODOS", "PANCREAS", "ADRENALES", "FECHA"]
+    
     for clave in claves_mayusculas:
         match = re.search(rf"\[{clave}\]: (.*)", texto_ia)
         datos[clave.lower()] = match.group(1).strip().upper() if match else ""
+        
     for clave in claves_normales:
         match = re.search(rf"\[{clave}\]: (.*)", texto_ia)
-        datos[clave.lower()] = match.group(1).strip() if match else ""
+        texto_encontrado = match.group(1).strip() if match else ""
+        
+        # --- NUEVO: FRANCOTIRADOR DE NEGRITAS ---
+        indice = texto_encontrado.lower().find("sugerente de")
+        
+        if indice != -1:
+            # Separamos el texto justo donde termina "sugerente de"
+            corte = indice + len("sugerente de")
+            parte_normal = texto_encontrado[:corte]
+            parte_enfermedades = texto_encontrado[corte:]
+            
+            # Aplicamos el formato avanzado de Word
+            rt = RichText(parte_normal)
+            rt.add(parte_enfermedades, bold=True) # Aquí se hace la magia
+            datos[clave.lower()] = rt
+        else:
+            # Si el órgano está sano, pasa el texto normal
+            datos[clave.lower()] = texto_encontrado
+            
     return datos
-
+    
 if st.button("✨ PROCESAR INFORME CLÍNICO"):
     if not API_KEY:
         st.error("🔑 Error: Ingresa la API Key en el menú lateral.")
