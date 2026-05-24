@@ -3,86 +3,67 @@ import google.generativeai as genai
 import io
 import re
 from docxtpl import DocxTemplate, RichText
-import streamlit.components.v1 as components  # <-- NUEVO: Para el confeti y el sonido
+import streamlit.components.v1 as components
 
-# 1. CONFIGURACIÓN DE PÁGINA
+# 1. CONFIGURACIÓN
 st.set_page_config(page_title="UltraVET | Informes", page_icon="logo_ultravet.png", layout="centered")
+
+# Extraer la clave secreta directamente de la nube
+try:
+    API_KEY = st.secrets["GEMINI_API_KEY"]
+except:
+    API_KEY = ""
 
 # 2. COLORES Y ESTILOS "ULTRA-VET PREMIUM" (CSS)
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600&display=swap');
-    
-    html, body, [class*="css"] {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-    .stApp {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    }
+    html, body, [class*="css"] { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .stApp { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); }
     div[data-testid="stVerticalBlock"] > div:has(div.stRadio), .stTextArea, .stFileUploader {
-        background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 25px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px);
+        border-radius: 20px; padding: 25px; border: 1px solid rgba(255, 255, 255, 0.3);
         box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
     }
     div.stButton > button:first-child {
-        background: linear-gradient(135deg, #007682 0%, #004e56 100%);
-        color: white;
-        border-radius: 12px;
-        padding: 15px 30px;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        border: none;
-        width: 100%;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        box-shadow: 0 4px 15px rgba(0, 118, 130, 0.3);
+        background: linear-gradient(135deg, #007682 0%, #004e56 100%); color: white;
+        border-radius: 12px; padding: 15px 30px; font-weight: 600; letter-spacing: 0.5px;
+        border: none; width: 100%; transition: all 0.4s ease; box-shadow: 0 4px 15px rgba(0, 118, 130, 0.3);
     }
-    div.stButton > button:first-child:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(0, 118, 130, 0.4);
-        color: #e0e0e0;
-    }
-    h1 {
-        color: #003049;
-        font-weight: 700 !important;
-        letter-spacing: -1px;
-    }
-    [data-testid="stSidebar"] {
-        background-color: #003049;
-    }
+    div.stButton > button:first-child:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0, 118, 130, 0.4); color: #e0e0e0; }
+    h1 { color: #003049; font-weight: 700 !important; letter-spacing: -1px; }
+    [data-testid="stSidebar"] { background-color: #003049; }
     [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3, 
     [data-testid="stSidebar"] h4, [data-testid="stSidebar"] p, [data-testid="stSidebar"] span, 
-    [data-testid="stSidebar"] small, [data-testid="stSidebar"] label {
-        color: #ffffff !important;
+    [data-testid="stSidebar"] small, [data-testid="stSidebar"] label { color: #ffffff !important; }
+    /* Estilo para la tarjeta de resumen */
+    .resumen-card {
+        background-color: #ffffff; padding: 15px; border-left: 5px solid #007682;
+        border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; color: #003049;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# 3. BARRA LATERAL
+# 3. BARRA LATERAL (Ya sin pedir contraseña)
 with st.sidebar:
     try:
         st.image("logo_ultravet.png", width=220)
     except:
         st.markdown("## 🩺 ULTRA-VET")
     
-    st.markdown("### ⚙️ Centro de Control")
-    API_KEY = st.text_input("🔑 Clave Maestra API:", type="password")
-    
     st.divider()
     st.markdown("#### 🚀 Estado del Sistema")
     if API_KEY:
-        st.success("Conectado a la Red Neuronal")
+        st.success("✅ Conectado a la Red Neuronal Segura")
     else:
-        st.warning("Esperando Credenciales...")
+        st.error("❌ Faltan Credenciales (Revisa Streamlit Secrets)")
     
     st.divider()
-    st.markdown("<small>UltraVet © 2026<br>Diseñado por: Santiago Grefa</small>", unsafe_allow_html=True)
+    st.markdown("<small>Versión 2.5 - UltraVet © 2026<br>Diseño Aesthetic & Pro</small>", unsafe_allow_html=True)
 
 # 4. CUERPO PRINCIPAL
 st.markdown("<h1 style='text-align: center;'>Panel de Imagenología Móvil</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #576574;'>Bienvenid@, por favor ingresa los datos necesarios para desarrollar el informe.</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #576574;'>Automatización inteligente para informes ecográficos de alta precisión.</p>", unsafe_allow_html=True)
 st.write("---")
 
 col1, col2 = st.columns([1, 1])
@@ -100,21 +81,15 @@ else:
 
 st.write("")
 
+# 5. MOTOR VETERINARIO CON REGLA DE AUDIO INTELIGENTE
 prompt_maestro = """
 Eres un Médico Veterinario Especialista en Imagenología con años de experiencia. Tu tarea es analizar el dictado de un doctor y estructurar el reporte ecográfico perfecto. El documento final NO será revisado por un humano, por lo que la precisión y ortografía médica deben ser INTACHABLES.
 
 REGLAS ESTRICTAS DE REDACCIÓN Y ORTOGRAFÍA MÉDICA:
-1. TÉRMINOS UNIDOS: NUNCA separes prefijos médicos. Escribe SIEMPRE de forma unida: "hipoecogénico" (no hipo ecogénico), "peripancreática" (no peri pancreática), "corticomedular" (no cortico medular), "ecotextura" (no eco textura), "hiperecogénico", "isoecogénico", "linfadenopatía".
-2. ÓRGANOS NORMALES (SIN ALTERACIONES): Si el dictado NO menciona problemas en un órgano, o dice que está "normal", DEBES usar ESTRICTAMENTE las frases predeterminadas que están abajo. Solo debes rellenar las medidas (mm o cm) si el doctor las dictó.
-3. ÓRGANOS CON PATOLOGÍAS: Si el dictado menciona alteraciones, redacta el hallazgo usando terminología médica veterinaria avanzada y perfecta ortografía. Al final de la descripción del órgano, DEBES deducir e incluir diagnósticos diferenciales obligatoriamente en este formato: ", sugerente de (1. [Diagnóstico A] 2. [Diagnóstico B])."
-
-*** EJEMPLO DE CÓMO DEBES PENSAR Y TRADUCIR ***
-Si el audio dice: "El riñón izquierdo está mal, mide 3.4 cm, se ve difuso y tiene mineralización. El estómago está engrosado, mide 4.7 mm con líquido, parece gastritis. Vejiga normal de 1.1 mm."
-TU RESPUESTA DEBE SER:
-[RINONES]: Riñón izquierdo, arquitectura alterada de bordes regulares, ecogenicidad difusa, diferenciación corticomedular reducida, mide 3.4 cm en eje longitudinal... presenta focos de mineralización corticomedular, sugerente de (1. Nefropatía 2. Cambios asociados a la raza).
-[ESTOMAGO]: Pared estomacal de grosor levemente aumentado, estratificación conservada, presenta contenido liquido en moderada cantidad, la pared mide 4.7 mm en el cuerpo gástrico, sugerente de (1. Gastritis leve).
-[VEJIGA]: Presenta moderado contenido anecoico, sin sedimento, la pared dorsal mide 1.10 mm de grosor normal.
-**********************************************
+1. TÉRMINOS UNIDOS: NUNCA separes prefijos médicos. Escribe SIEMPRE de forma unida: "hipoecogénico", "peripancreática", "corticomedular", "ecotextura", "hiperecogénico", "isoecogénico", "linfadenopatía".
+2. ÓRGANOS NORMALES: Si el dictado NO menciona problemas en un órgano, o dice que está "normal", DEBES usar ESTRICTAMENTE las frases predeterminadas que están abajo. Solo rellena las medidas si el doctor las dictó.
+3. ÓRGANOS CON PATOLOGÍAS: Si el dictado menciona alteraciones, redacta el hallazgo con terminología avanzada. Al final de la descripción del órgano, DEBES deducir e incluir diagnósticos diferenciales obligatoriamente en este formato: ", sugerente de (1. [Diagnóstico A] 2. [Diagnóstico B])."
+4. FILTRO DE AUDIO EN VIVO: El médico grabará el audio en tiempo real y puede dudar. IGNORA pausas, muletillas ("ehh", "mmm") y autocorrecciones (ej. "el bazo mide 3... no, perdón, anota 4 cm" -> debes extraer solo "4 cm"). Extrae únicamente el dato clínico final definitivo.
 
 [FRASES PREDETERMINADAS PARA ÓRGANOS NORMALES]
 - VEJIGA: Presenta moderado contenido anecoico, sin sedimento, la pared dorsal mide [medida] mm de grosor normal.
@@ -128,7 +103,7 @@ TU RESPUESTA DEBE SER:
 - PANCREAS: El parénquima es homogéneo, hipoecogénico en relación con el tejido aledaño, grosor normal, mide [medida] mm en corte transversal de la rama derecha, sin liquido libre, ni esteatitis de la grasa peripancreática.
 - ADRENALES: Adrenal izquierda, ecogenicidad adecuada, arquitectura conservada, tamaño normal, mide [medida] mm en el polo caudal. Adrenal derecha, ecogenicidad adecuada, arquitectura conservada, tamaño normal, mide [medida] mm en el polo caudal.
 
-Extrae la información y devuélvela ESTRICTAMENTE en este formato de lista. NO añadas texto extra antes ni después de la lista:
+Extrae la información y devuélvela ESTRICTAMENTE en este formato de lista:
 
 [CLIENTE]: [Extraer]
 [NOMBRE]: [Extraer]
@@ -166,32 +141,26 @@ def extraer_datos_ia(texto_ia):
         match = re.search(rf"\[{clave}\]: (.*)", texto_ia)
         texto_encontrado = match.group(1).strip() if match else ""
         
-        # --- NUEVO: FRANCOTIRADOR DE NEGRITAS ---
         indice = texto_encontrado.lower().find("sugerente de")
-        
         if indice != -1:
-            # Separamos el texto justo donde termina "sugerente de"
             corte = indice + len("sugerente de")
             parte_normal = texto_encontrado[:corte]
             parte_enfermedades = texto_encontrado[corte:]
-            
-            # Aplicamos el formato avanzado de Word
             rt = RichText(parte_normal)
-            rt.add(parte_enfermedades, bold=True) # Aquí se hace la magia
+            rt.add(parte_enfermedades, bold=True)
             datos[clave.lower()] = rt
         else:
-            # Si el órgano está sano, pasa el texto normal
             datos[clave.lower()] = texto_encontrado
             
     return datos
-    
+
 if st.button("✨ PROCESAR INFORME CLÍNICO"):
     if not API_KEY:
-        st.error("🔑 Error: Ingresa la API Key en el menú lateral.")
+        st.error("❌ Falla crítica: No se detectó la API Key en Streamlit Secrets.")
     elif (opcion_ingreso == "Subir Audio 🎙️" and not audio_file) or (opcion_ingreso == "Pegar Texto 📝" and not transcripcion):
         st.warning("📂 Por favor, ingresa el audio o texto del paciente.")
     else:
-        with st.spinner('🧬 La IA está analizando los hallazgos...'):
+        with st.spinner('🧬 Analizando datos y suprimiendo ruidos/pausas...'):
             try:
                 genai.configure(api_key=API_KEY)
                 modelos_disponibles = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
@@ -216,53 +185,43 @@ if st.button("✨ PROCESAR INFORME CLÍNICO"):
                 doc.save(buffer)
                 buffer.seek(0)
                 
-                st.success("### ✅ Informe Generado Correctamente")
-                
-                # --- NUEVO EFECTO: Confeti Sutil y Sonido ---
                 st.toast("Documento estructurado con éxito", icon="✔️")
                 components.html(
                     """
                     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
                     <script>
-                        // Sonido de Visto/Check suave
                         var audio = new Audio('https://upload.wikimedia.org/wikipedia/commons/3/34/Sound_Effect_-_Ping_Ding.ogg');
-                        audio.volume = 0.5;
-                        audio.play().catch(e => console.log("Audio silenciado por el navegador"));
-
-                        // Animación de confeti desde las esquinas inferiores
-                        var duration = 1.5 * 1000;
-                        var end = Date.now() + duration;
-                        var colors = ['#007682', '#003049']; // Colores institucionales
-
+                        audio.volume = 0.5; audio.play().catch(e => console.log("Audio silenciado"));
+                        var duration = 1.5 * 1000; var end = Date.now() + duration; var colors = ['#007682', '#003049'];
                         (function frame() {
-                            confetti({
-                                particleCount: 4,
-                                angle: 60,
-                                spread: 55,
-                                origin: { x: 0, y: 1 },
-                                colors: colors
-                            });
-                            confetti({
-                                particleCount: 4,
-                                angle: 120,
-                                spread: 55,
-                                origin: { x: 1, y: 1 },
-                                colors: colors
-                            });
-                            if (Date.now() < end) {
-                                requestAnimationFrame(frame);
-                            }
+                            confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0, y: 1 }, colors: colors });
+                            confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1, y: 1 }, colors: colors });
+                            if (Date.now() < end) { requestAnimationFrame(frame); }
                         }());
                     </script>
                     """,
                     height=0, width=0
                 )
-                # ----------------------------------------------
+                
+                st.success("### ✅ ¡Procesamiento Completo!")
+                
+                # --- NUEVA TARJETA DE RESUMEN ---
+                nombre_paciente = contexto_datos.get('nombre', 'Desconocido')
+                especie_paciente = contexto_datos.get('especie', 'No especificada')
+                medico = contexto_datos.get('medico', 'No especificado')
+                
+                st.markdown(f"""
+                <div class="resumen-card">
+                    <b>🔍 Resumen Rápido de Extracción:</b><br>
+                    🐾 Paciente: <b>{nombre_paciente}</b> ({especie_paciente})<br>
+                    🩺 Médico: <b>{medico}</b>
+                </div>
+                """, unsafe_allow_html=True)
                 
                 st.download_button(
                     label="📥 DESCARGAR REPORTE OFICIAL (.DOCX)",
                     data=buffer,
-                    file_name=f"Informe_UltraVet_{contexto_datos.get('nombre', 'Paciente')}.docx",
+                    file_name=f"Informe_UltraVet_{nombre_paciente}.docx",
                     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                 )
                 
