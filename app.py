@@ -141,19 +141,30 @@ def extraer_datos_ia(texto_ia):
         match = re.search(rf"\[{clave}\]: (.*)", texto_ia)
         texto_encontrado = match.group(1).strip() if match else ""
         
-        indice = texto_encontrado.lower().find("sugerente de")
-        if indice != -1:
-            corte = indice + len("sugerente de")
-            parte_normal = texto_encontrado[:corte]
-            parte_enfermedades = texto_encontrado[corte:]
-            rt = RichText(parte_normal)
-            rt.add(parte_enfermedades, bold=True)
+        # --- NUEVO: FRANCOTIRADOR DE NEGRITAS PRECISO ---
+        # Busca "sugerente de", abre paréntesis, cualquier texto, y cierra paréntesis (incluyendo un punto si lo hay)
+        match_sugerente = re.search(r'(sugerente de\s*\([^)]+\)\.?)', texto_encontrado, re.IGNORECASE)
+        
+        if match_sugerente:
+            texto_bold = match_sugerente.group(1) # Atrapa exactamente: sugerente de (1. ... 2. ...).
+            
+            # Divide el párrafo en 3 partes: Antes, la Negrita, y Después
+            partes = texto_encontrado.split(texto_bold, 1)
+            parte_antes = partes[0]
+            parte_despues = partes[1] if len(partes) > 1 else ""
+            
+            rt = RichText(parte_antes)
+            rt.add(texto_bold, bold=True) # Aplica negrita SOLO a la patología
+            
+            if parte_despues:
+                rt.add(parte_despues) # Añade el resto del texto normal (ej. Vena cava...)
+                
             datos[clave.lower()] = rt
         else:
             datos[clave.lower()] = texto_encontrado
             
     return datos
-
+    
 if st.button("✨ PROCESAR INFORME CLÍNICO"):
     if not API_KEY:
         st.error("❌ Falla crítica: No se detectó la API Key en Streamlit Secrets.")
