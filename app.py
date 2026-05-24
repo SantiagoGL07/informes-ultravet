@@ -125,13 +125,14 @@ Extrae la información y devuélvela ESTRICTAMENTE en este formato de lista:
 [LINFONODOS]: [Hallazgos]
 [PANCREAS]: [Hallazgos]
 [ADRENALES]: [Hallazgos]
+[OTROS_HALLAZGOS]: [Hallazgos extra dictados. Si son varios, sepáralos con un punto o guiones, pero mantén TODO en una sola línea]
 [FECHA]: [Extraer o poner fecha actual]
 """
 
 def extraer_datos_ia(texto_ia):
     datos = {}
     claves_mayusculas = ["CLIENTE", "NOMBRE", "EDAD", "ESPECIE", "RAZA", "SEXO", "NHC", "MEDICO", "CENTRO", "REGION"]
-    claves_normales = ["VEJIGA", "RINONES", "HIGADO", "BAZO", "ESTOMAGO", "INTESTINO", "COLON", "LINFONODOS", "PANCREAS", "ADRENALES", "FECHA"]
+    claves_normales = ["VEJIGA", "RINONES", "HIGADO", "BAZO", "ESTOMAGO", "INTESTINO", "COLON", "LINFONODOS", "PANCREAS", "ADRENALES", "OTROS_HALLAZGOS", "FECHA"]
     
     for clave in claves_mayusculas:
         match = re.search(rf"\[{clave}\]: (.*)", texto_ia)
