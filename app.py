@@ -83,13 +83,15 @@ st.write("")
 
 # 5. MOTOR VETERINARIO CON REGLA DE AUDIO INTELIGENTE
 prompt_maestro = """
-Eres un Médico Veterinario Especialista en Imagenología con años de experiencia. Tu tarea es analizar el dictado de un doctor y estructurar el reporte ecográfico perfecto. El documento final NO será revisado por un humano, por lo que la precisión y ortografía médica deben ser INTACHABLES.
+Eres un Médico Veterinario Especialista en Imagenología con años de experiencia. Tu tarea es analizar el dictado de un doctor y estructurar el reporte ecográfico perfecto. El documento final NO será revisado, la precisión debe ser INTACHABLE.
 
-REGLAS ESTRICTAS DE REDACCIÓN Y ORTOGRAFÍA MÉDICA:
-1. TÉRMINOS UNIDOS: NUNCA separes prefijos médicos. Escribe SIEMPRE de forma unida: "hipoecogénico", "peripancreática", "corticomedular", "ecotextura", "hiperecogénico", "isoecogénico", "linfadenopatía".
-2. ÓRGANOS NORMALES: Si el dictado NO menciona problemas en un órgano, o dice que está "normal", DEBES usar ESTRICTAMENTE las frases predeterminadas que están abajo. Solo rellena las medidas si el doctor las dictó.
-3. ÓRGANOS CON PATOLOGÍAS: Si el dictado menciona alteraciones, redacta el hallazgo con terminología avanzada. Al final de la descripción del órgano, DEBES deducir e incluir diagnósticos diferenciales obligatoriamente en este formato: ", sugerente de (1. [Diagnóstico A] 2. [Diagnóstico B])."
-4. FILTRO DE AUDIO EN VIVO: El médico grabará el audio en tiempo real y puede dudar. IGNORA pausas, muletillas ("ehh", "mmm") y autocorrecciones (ej. "el bazo mide 3... no, perdón, anota 4 cm" -> debes extraer solo "4 cm"). Extrae únicamente el dato clínico final definitivo.
+REGLAS ESTRICTAS:
+1. TÉRMINOS UNIDOS: Escribe SIEMPRE de forma unida: "hipoecogénico", "peripancreática", "corticomedular", "ecotextura", "hiperecogénico", "isoecogénico", "linfadenopatía".
+2. CAMPOS OBLIGATORIOS (ANTI-VACÍOS): Está ESTRICTAMENTE PROHIBIDO dejar un órgano en blanco. Si el audio NO menciona un órgano (ej. Linfonodos), DEBES copiar y pegar la frase predeterminada de abajo (ej. "No se observa linfadenopatía."). NUNCA devuelvas un campo vacío.
+3. DIAGNÓSTICOS DIFERENCIALES: Si hay patologías, usa el formato "sugerente de" al final del órgano con esta regla:
+   - Si hay UNA SOLA patología, NO uses números: ", sugerente de ([Diagnóstico])."
+   - Si hay DOS O MÁS patologías, usa números: ", sugerente de (1. [Diagnóstico A] 2. [Diagnóstico B])."
+4. FILTRO DE AUDIO EN VIVO: IGNORA pausas, muletillas ("ehh", "mmm") y autocorrecciones del doctor. Extrae únicamente el dato clínico definitivo.
 
 [FRASES PREDETERMINADAS PARA ÓRGANOS NORMALES]
 - VEJIGA: Presenta moderado contenido anecoico, sin sedimento, la pared dorsal mide [medida] mm de grosor normal.
@@ -125,7 +127,7 @@ Extrae la información y devuélvela ESTRICTAMENTE en este formato de lista:
 [LINFONODOS]: [Hallazgos]
 [PANCREAS]: [Hallazgos]
 [ADRENALES]: [Hallazgos]
-[OTROS_HALLAZGOS]: [Hallazgos extra dictados. Si son varios, sepáralos con un punto o guiones, pero mantén TODO en una sola línea]
+[OTROS_HALLAZGOS]: [Extraer o dejar espacio]
 [FECHA]: [Extraer o poner fecha actual]
 """
 
@@ -142,37 +144,39 @@ def extraer_datos_ia(texto_ia):
         match = re.search(rf"\[{clave}\]: (.*)", texto_ia)
         texto_encontrado = match.group(1).strip() if match else ""
         
-        # --- NUEVO: FRANCOTIRADOR DE NEGRITAS PRECISO ---
-        # Busca "sugerente de", abre paréntesis, cualquier texto, y cierra paréntesis (incluyendo un punto si lo hay)
-        match_sugerente = re.search(r'(sugerente de\s*\([^)]+\)\.?)', texto_encontrado, re.IGNORECASE)
+        # --- NUEVO FRANCOTIRADOR DE NEGRITAS PERFECTO ---
+        # Busca "sugerente de" y aísla SOLO los paréntesis para ponerlos en negrita
+        match_sugerente = re.search(r'(sugerente de\s*)(\([^)]+\))', texto_encontrado, re.IGNORECASE)
         
         if match_sugerente:
-            texto_bold = match_sugerente.group(1) # Atrapa exactamente: sugerente de (1. ... 2. ...).
-            
-            # Divide el párrafo en 3 partes: Antes, la Negrita, y Después
-            partes = texto_encontrado.split(texto_bold, 1)
-            parte_antes = partes[0]
-            parte_despues = partes[1] if len(partes) > 1 else ""
+            # Parte 1: Todo el texto hasta el paréntesis (incluye el "sugerente de ")
+            parte_antes = texto_encontrado[:match_sugerente.start(2)]
+            # Parte 2: Exactamente el texto dentro del paréntesis (...)
+            parte_bold = match_sugerente.group(2)
+            # Parte 3: Cualquier cosa después del paréntesis (un punto, etc.)
+            parte_despues = texto_encontrado[match_sugerente.end(2):]
             
             rt = RichText(parte_antes)
-            rt.add(texto_bold, bold=True) # Aplica negrita SOLO a la patología
-            
+            rt.add(parte_bold, bold=True) # AQUÍ APLICA LA NEGRILLA SOLO AL PARÉNTESIS
             if parte_despues:
-                rt.add(parte_despues) # Añade el resto del texto normal (ej. Vena cava...)
-                
+                rt.add(parte_despues)
             datos[clave.lower()] = rt
         else:
+            # Si por algún milagro la IA dejó vacío un órgano, el sistema inyecta un espacio 
+            # para no dañar el formato del Word.
+            if texto_encontrado == "":
+                texto_encontrado = " "
             datos[clave.lower()] = texto_encontrado
             
     return datos
-    
+
 if st.button("✨ PROCESAR INFORME CLÍNICO"):
     if not API_KEY:
         st.error("❌ Falla crítica: No se detectó la API Key en Streamlit Secrets.")
     elif (opcion_ingreso == "Subir Audio 🎙️" and not audio_file) or (opcion_ingreso == "Pegar Texto 📝" and not transcripcion):
         st.warning("📂 Por favor, ingresa el audio o texto del paciente.")
     else:
-        with st.spinner('🧬 Analizando datos y suprimiendo ruidos/pausas...'):
+        with st.spinner('🧬 Analizando datos y formateando parámetros clínicos...'):
             try:
                 genai.configure(api_key=API_KEY)
                 modelos_disponibles = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
@@ -217,7 +221,7 @@ if st.button("✨ PROCESAR INFORME CLÍNICO"):
                 
                 st.success("### ✅ ¡Procesamiento Completo!")
                 
-                # --- NUEVA TARJETA DE RESUMEN ---
+                # --- TARJETA DE RESUMEN ---
                 nombre_paciente = contexto_datos.get('nombre', 'Desconocido')
                 especie_paciente = contexto_datos.get('especie', 'No especificada')
                 medico = contexto_datos.get('medico', 'No especificado')
