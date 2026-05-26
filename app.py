@@ -13,7 +13,7 @@ st.set_page_config(page_title="UltraVET | Informes", page_icon="logo_ultravet.pn
 try:
     API_KEY = st.secrets["AIzaSyDPXKQfhR1UOgVDG2Pbm2jBs7WF2oPCKsg"]
 except:
-    API_KEY = ""
+    API_KEY = "AIzaSyDPXKQfhR1UOgVDG2Pbm2jBs7WF2oPCKsg"
 
 # ==========================================
 # 2. ESTILOS Y UI (AESTHETIC)
