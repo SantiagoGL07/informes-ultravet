@@ -54,11 +54,11 @@ with st.sidebar:
     st.divider()
     st.markdown("#### 🚀 Estado del Sistema")
     if API_KEY:
-        st.success("✅ Sistema Blindado Activo")
+        st.success("✅ Sistema Activo")
     else:
         st.error("❌ Faltan Credenciales")
     st.divider()
-    st.markdown("<small>Versión 4.0 FINAL<br>Blindaje Anti-Alucinaciones © 2026</small>", unsafe_allow_html=True)
+    st.markdown("<small>Versión 4.0<br>Ultra Vet © 2026</small>Santiago G.", unsafe_allow_html=True)
 
 st.markdown("<h1 style='text-align: center;'>Panel de Imagenología Móvil</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: #576574;'>Sistema dictatorial de precisión ecográfica.</p>", unsafe_allow_html=True)
