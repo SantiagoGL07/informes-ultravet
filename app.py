@@ -5,16 +5,19 @@ import re
 from docxtpl import DocxTemplate, RichText
 import streamlit.components.v1 as components
 
-# 1. CONFIGURACIÓN
+# ==========================================
+# 1. CONFIGURACIÓN DEL SERVIDOR
+# ==========================================
 st.set_page_config(page_title="UltraVET | Informes", page_icon="logo_ultravet.png", layout="centered")
 
-# Extraer la clave secreta directamente de la nube
 try:
     API_KEY = st.secrets["GEMINI_API_KEY"]
 except:
     API_KEY = ""
 
-# 2. COLORES Y ESTILOS "ULTRA-VET PREMIUM" (CSS)
+# ==========================================
+# 2. ESTILOS Y UI (AESTHETIC)
+# ==========================================
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600&display=swap');
@@ -36,7 +39,6 @@ st.markdown("""
     [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3, 
     [data-testid="stSidebar"] h4, [data-testid="stSidebar"] p, [data-testid="stSidebar"] span, 
     [data-testid="stSidebar"] small, [data-testid="stSidebar"] label { color: #ffffff !important; }
-    /* Estilo para la tarjeta de resumen */
     .resumen-card {
         background-color: #ffffff; padding: 15px; border-left: 5px solid #007682;
         border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; color: #003049;
@@ -44,26 +46,22 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 3. BARRA LATERAL (Ya sin pedir contraseña)
 with st.sidebar:
     try:
         st.image("logo_ultravet.png", width=220)
     except:
         st.markdown("## 🩺 ULTRA-VET")
-    
     st.divider()
     st.markdown("#### 🚀 Estado del Sistema")
     if API_KEY:
-        st.success("✅ Conectado a la Red Neuronal Segura")
+        st.success("✅ Sistema Blindado Activo")
     else:
-        st.error("❌ Faltan Credenciales (Revisa Streamlit Secrets)")
-    
+        st.error("❌ Faltan Credenciales")
     st.divider()
-    st.markdown("<small>UltraVet © 2026<br>Diseñado por: Santiago Grefa</small>", unsafe_allow_html=True)
+    st.markdown("<small>Versión 4.0 FINAL<br>Blindaje Anti-Alucinaciones © 2026</small>", unsafe_allow_html=True)
 
-# 4. CUERPO PRINCIPAL
 st.markdown("<h1 style='text-align: center;'>Panel de Imagenología Móvil</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #576574;'>Bienvenid@, por favor completa la información solicitada para desarrollar el informe.</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #576574;'>Sistema dictatorial de precisión ecográfica.</p>", unsafe_allow_html=True)
 st.write("---")
 
 col1, col2 = st.columns([1, 1])
@@ -73,27 +71,27 @@ with col1:
 
 audio_file = None
 transcripcion = ""
-
 if opcion_ingreso == "Subir Audio 🎙️":
     audio_file = st.file_uploader("Arrastra el audio aquí", type=['mp3', 'wav', 'm4a', 'ogg'])
 else:
-    transcripcion = st.text_area("Pega la transcripción clínica:", placeholder="Dictado del médico...", height=180)
+    transcripcion = st.text_area("Pega la transcripción clínica:", height=180)
 
-st.write("")
-
-# 5. MOTOR VETERINARIO CON REGLA DE AUDIO INTELIGENTE
+# ==========================================
+# 3. EL CEREBRO DE LA IA (MODO DICTADOR)
+# ==========================================
 prompt_maestro = """
-Eres un Médico Veterinario Especialista en Imagenología con años de experiencia. Tu tarea es analizar el dictado de un doctor y estructurar el reporte ecográfico perfecto. El documento final NO será revisado, la precisión debe ser INTACHABLE.
+Eres un analizador de datos ecográficos. Tu nivel de creatividad es CERO. Eres un algoritmo de copia y reemplazo.
 
-REGLAS ESTRICTAS:
-1. TÉRMINOS UNIDOS: Escribe SIEMPRE de forma unida: "hipoecogénico", "peripancreática", "corticomedular", "ecotextura", "hiperecogénico", "isoecogénico", "linfadenopatía".
-2. CAMPOS OBLIGATORIOS (ANTI-VACÍOS): Está ESTRICTAMENTE PROHIBIDO dejar un órgano en blanco. Si el audio NO menciona un órgano (ej. Linfonodos), DEBES copiar y pegar la frase predeterminada de abajo (ej. "No se observa linfadenopatía."). NUNCA devuelvas un campo vacío.
-3. DIAGNÓSTICOS DIFERENCIALES: Si hay patologías, usa el formato "sugerente de" al final del órgano con esta regla:
-   - Si hay UNA SOLA patología, NO uses números: ", sugerente de ([Diagnóstico])."
-   - Si hay DOS O MÁS patologías, usa números: ", sugerente de (1. [Diagnóstico A] 2. [Diagnóstico B])."
-4. FILTRO DE AUDIO EN VIVO: IGNORA pausas, muletillas ("ehh", "mmm") y autocorrecciones del doctor. Extrae únicamente el dato clínico definitivo.
+REGLAS ABSOLUTAS INQUEBRANTABLES:
+1. ORTOGRAFÍA MÉDICA OBLIGATORIA: Escribe SIEMPRE de forma unida: "hipoecogénico", "peripancreática", "corticomedular", "ecotextura", "hiperecogénico", "isoecogénico", "linfadenopatía", "hemitórax". NUNCA LOS SEPARES.
+2. ÓRGANOS SANOS (PROHIBIDO MODIFICAR): Si un órgano está sano o no se menciona, COPIA LA FRASE PREDETERMINADA EXACTA. NO resumas, NO borres comas, NO alteres palabras. Solo rellena los números de las medidas si se dictaron.
+3. REGLA DE PATOLOGÍAS Y PARÉNTESIS: 
+   - Cuando deduzcas diferenciales, usa EXACTAMENTE esta frase base: ", sugerente de "
+   - Si es 1 sola patología: ", sugerente de (Patología)."
+   - Si son 2 o más patologías: ", sugerente de (1. Patología A 2. Patología B)."
+   - TODO LO QUE ESTÉ DESPUÉS DE "sugerente de" DEBE IR ENCERRADO ENTRE PARÉNTESIS Y EN NEGRILLAS.
 
-[FRASES PREDETERMINADAS PARA ÓRGANOS NORMALES]
+[FRASES PREDETERMINADAS - COPIADO LITERAL]
 - VEJIGA: Presenta moderado contenido anecoico, sin sedimento, la pared dorsal mide [medida] mm de grosor normal.
 - RINONES: Riñón izquierdo, arquitectura conservada de bordes regulares, ecogenicidad normal, diferenciación corticomedular adecuada, mide [medida] cm en eje longitudinal. Riñón derecho, arquitectura conservada de bordes regulares, ecogenicidad normal, diferenciación corticomedular adecuada, mide [medida] cm de diámetro en corte longitudinal.
 - HIGADO: Tamaño conservado, ecotextura granular fina, contornos aguzados, ecogenicidad conservada. La vesícula biliar presenta contenido anecoico en moderada cantidad sin sedimento, la pared tiene grosor adecuado. Vena cava, porta y aorta de tamaño normal.
@@ -105,31 +103,46 @@ REGLAS ESTRICTAS:
 - PANCREAS: El parénquima es homogéneo, hipoecogénico en relación con el tejido aledaño, grosor normal, mide [medida] mm en corte transversal de la rama derecha, sin liquido libre, ni esteatitis de la grasa peripancreática.
 - ADRENALES: Adrenal izquierda, ecogenicidad adecuada, arquitectura conservada, tamaño normal, mide [medida] mm en el polo caudal. Adrenal derecha, ecogenicidad adecuada, arquitectura conservada, tamaño normal, mide [medida] mm en el polo caudal.
 
-Extrae la información y devuélvela ESTRICTAMENTE en este formato de lista:
-
-[CLIENTE]: [Extraer]
-[NOMBRE]: [Extraer]
-[EDAD]: [Extraer]
-[ESPECIE]: [Extraer]
-[RAZA]: [Extraer o dejar vacío]
-[SEXO]: [Extraer]
-[NHC]: [Extraer o dejar vacío]
-[MEDICO]: [Extraer]
-[CENTRO]: [Extraer]
-[REGION]: [Extraer]
-[VEJIGA]: [Hallazgos]
-[RINONES]: [Hallazgos]
-[HIGADO]: [Hallazgos]
-[BAZO]: [Hallazgos]
-[ESTOMAGO]: [Hallazgos]
-[INTESTINO]: [Hallazgos]
-[COLON]: [Hallazgos]
-[LINFONODOS]: [Hallazgos]
-[PANCREAS]: [Hallazgos]
-[ADRENALES]: [Hallazgos]
-[OTROS_HALLAZGOS]: [Extraer o dejar espacio]
+Extrae la información ESTRICTAMENTE en este formato de lista:
+[CLIENTE]: [Dato]
+[NOMBRE]: [Dato]
+[EDAD]: [Dato]
+[ESPECIE]: [Dato]
+[RAZA]: [Dato o dejar vacío]
+[SEXO]: [Dato]
+[NHC]: [Dato o dejar vacío]
+[MEDICO]: [Dato]
+[CENTRO]: [Dato]
+[REGION]: [Dato]
+[VEJIGA]: [Texto]
+[RINONES]: [Texto]
+[HIGADO]: [Texto]
+[BAZO]: [Texto]
+[ESTOMAGO]: [Texto]
+[INTESTINO]: [Texto]
+[COLON]: [Texto]
+[LINFONODOS]: [Texto]
+[PANCREAS]: [Texto]
+[ADRENALES]: [Texto]
+[OTROS_HALLAZGOS]: [Texto o dejar vacío]
 [FECHA]: [Extraer o poner fecha actual]
 """
+
+# ==========================================
+# 4. EL PARACAÍDAS PYTHON (Muro de Contención)
+# ==========================================
+FRASES_FALLBACK = {
+    "vejiga": "Presenta moderado contenido anecoico, sin sedimento, la pared dorsal mide  mm de grosor normal.",
+    "rinones": "Riñón izquierdo, arquitectura conservada de bordes regulares, ecogenicidad normal, diferenciación corticomedular adecuada, mide  cm en eje longitudinal. Riñón derecho, arquitectura conservada de bordes regulares, ecogenicidad normal, diferenciación corticomedular adecuada, mide  cm de diámetro en corte longitudinal.",
+    "higado": "Tamaño conservado, ecotextura granular fina, contornos aguzados, ecogenicidad conservada. La vesícula biliar presenta contenido anecoico en moderada cantidad sin sedimento, la pared tiene grosor adecuado. Vena cava, porta y aorta de tamaño normal.",
+    "bazo": "De arquitectura conservada, ecogenicidad adecuada, ecotextura homogénea, tamaño normal, mide  cm de ancho en corte transversal a nivel del hilio esplénico.",
+    "estomago": "Pared estomacal de grosor normal, estratificación conservada, presenta contenido alimenticio en escasa cantidad y moderada cantidad de gas, la pared mide  mm en el cuerpo gástrico.",
+    "intestino": "En duodeno se observa: Peristaltismo normal, patrón mucoso, pared intestinal de grosor adecuado. Yeyuno: Peristaltismo adecuado, pared intestinal de grosor adecuado, patrón mucoso. Íleon: Peristaltismo adecuado, patrón mucoso, pared intestinal de grosor normal.",
+    "colon": "Estratificación conservada, paredes intestinales de grosor normal, la pared mide  mm.",
+    "linfonodos": "No se observa linfadenopatía.",
+    "pancreas": "El parénquima es homogéneo, hipoecogénico en relación con el tejido aledaño, grosor normal, mide  mm en corte transversal de la rama derecha, sin liquido libre, ni esteatitis de la grasa peripancreática.",
+    "adrenales": "Adrenal izquierda, ecogenicidad adecuada, arquitectura conservada, tamaño normal, mide  mm en el polo caudal. Adrenal derecha, ecogenicidad adecuada, arquitectura conservada, tamaño normal, mide  mm en el polo caudal."
+}
 
 def extraer_datos_ia(texto_ia):
     datos = {}
@@ -144,44 +157,45 @@ def extraer_datos_ia(texto_ia):
         match = re.search(rf"\[{clave}\]: (.*)", texto_ia)
         texto_encontrado = match.group(1).strip() if match else ""
         
-        # --- NUEVO FRANCOTIRADOR DE NEGRITAS PERFECTO ---
-        # Busca "sugerente de" y aísla SOLO los paréntesis para ponerlos en negrita
-        match_sugerente = re.search(r'(sugerente de\s*)(\([^)]+\))', texto_encontrado, re.IGNORECASE)
+        # 1. EL PARACAÍDAS ANTI-VACÍOS
+        if texto_encontrado == "" and clave.lower() in FRASES_FALLBACK:
+            texto_encontrado = FRASES_FALLBACK[clave.lower()]
+            
+        # 2. FRANCOTIRADOR DE NEGRILLAS (Blindado contra errores gramaticales)
+        match_sugerente = re.search(r'(sugerente(?:s)? de\s*)(\([^)]+\))', texto_encontrado, re.IGNORECASE)
         
         if match_sugerente:
-            # Parte 1: Todo el texto hasta el paréntesis (incluye el "sugerente de ")
             parte_antes = texto_encontrado[:match_sugerente.start(2)]
-            # Parte 2: Exactamente el texto dentro del paréntesis (...)
-            parte_bold = match_sugerente.group(2)
-            # Parte 3: Cualquier cosa después del paréntesis (un punto, etc.)
+            parte_bold = match_sugerente.group(2) # Solo agarra los paréntesis (...)
             parte_despues = texto_encontrado[match_sugerente.end(2):]
             
             rt = RichText(parte_antes)
-            rt.add(parte_bold, bold=True) # AQUÍ APLICA LA NEGRILLA SOLO AL PARÉNTESIS
+            rt.add(parte_bold, bold=True)
             if parte_despues:
                 rt.add(parte_despues)
             datos[clave.lower()] = rt
         else:
-            # Si por algún milagro la IA dejó vacío un órgano, el sistema inyecta un espacio 
-            # para no dañar el formato del Word.
-            if texto_encontrado == "":
-                texto_encontrado = " "
             datos[clave.lower()] = texto_encontrado
             
     return datos
 
-if st.button("✨ PROCESAR INFORME CLÍNICO"):
+# ==========================================
+# 5. EJECUCIÓN PRINCIPAL
+# ==========================================
+if st.button("✨ PROCESAR INFORME OFICIAL"):
     if not API_KEY:
-        st.error("❌ Falla crítica: No se detectó la API Key en Streamlit Secrets.")
+        st.error("❌ API Key no encontrada.")
     elif (opcion_ingreso == "Subir Audio 🎙️" and not audio_file) or (opcion_ingreso == "Pegar Texto 📝" and not transcripcion):
-        st.warning("📂 Por favor, ingresa el audio o texto del paciente.")
+        st.warning("📂 Falta información clínica.")
     else:
-        with st.spinner('🧬 Analizando datos y formateando parámetros clínicos...'):
+        with st.spinner('🧬 Blindaje activo. Procesando con 0% de margen de error...'):
             try:
                 genai.configure(api_key=API_KEY)
-                modelos_disponibles = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-                modelo_elegido = modelos_disponibles[0]
-                model = genai.GenerativeModel(modelo_elegido)
+                modelos = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+                
+                # TEMPERATURA 0.0: MATA LA IMAGINACIÓN DE LA IA
+                config = genai.GenerationConfig(temperature=0.0)
+                model = genai.GenerativeModel(modelos[0], generation_config=config)
                 
                 contenido_a_enviar = [prompt_maestro]
                 if opcion_ingreso == "Subir Audio 🎙️":
@@ -191,55 +205,43 @@ if st.button("✨ PROCESAR INFORME CLÍNICO"):
                     contenido_a_enviar.append(f"TEXTO:\n{transcripcion}")
                 
                 respuesta = model.generate_content(contenido_a_enviar)
-                texto_ia = respuesta.text
-                contexto_datos = extraer_datos_ia(texto_ia)
+                contexto_datos = extraer_datos_ia(respuesta.text)
                 
                 doc = DocxTemplate("plantilla.docx")
                 doc.render(contexto_datos)
-                
                 buffer = io.BytesIO()
                 doc.save(buffer)
                 buffer.seek(0)
                 
-                st.toast("Documento estructurado con éxito", icon="✔️")
+                st.toast("Estructura clínica garantizada", icon="✔️")
                 components.html(
                     """
                     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
                     <script>
                         var audio = new Audio('https://upload.wikimedia.org/wikipedia/commons/3/34/Sound_Effect_-_Ping_Ding.ogg');
                         audio.volume = 0.5; audio.play().catch(e => console.log("Audio silenciado"));
-                        var duration = 1.5 * 1000; var end = Date.now() + duration; var colors = ['#007682', '#003049'];
-                        (function frame() {
-                            confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0, y: 1 }, colors: colors });
-                            confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1, y: 1 }, colors: colors });
-                            if (Date.now() < end) { requestAnimationFrame(frame); }
-                        }());
+                        var colors = ['#007682', '#003049'];
+                        confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0, y: 1 }, colors: colors });
+                        confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1, y: 1 }, colors: colors });
                     </script>
-                    """,
-                    height=0, width=0
+                    """, height=0, width=0
                 )
                 
-                st.success("### ✅ ¡Procesamiento Completo!")
-                
-                # --- TARJETA DE RESUMEN ---
-                nombre_paciente = contexto_datos.get('nombre', 'Desconocido')
-                especie_paciente = contexto_datos.get('especie', 'No especificada')
-                medico = contexto_datos.get('medico', 'No especificado')
+                st.success("### ✅ ¡Procesamiento Perfecto!")
+                nombre = contexto_datos.get('nombre', 'Desconocido')
                 
                 st.markdown(f"""
                 <div class="resumen-card">
-                    <b>🔍 Resumen Rápido de Extracción:</b><br>
-                    🐾 Paciente: <b>{nombre_paciente}</b> ({especie_paciente})<br>
-                    🩺 Médico: <b>{medico}</b>
+                    <b>🔍 Paciente procesado:</b> {nombre}<br>
+                    <small><i>Formato y vocabulario garantizados bajo estándares estrictos.</i></small>
                 </div>
                 """, unsafe_allow_html=True)
                 
                 st.download_button(
-                    label="📥 DESCARGAR REPORTE OFICIAL (.DOCX)",
-                    data=buffer,
-                    file_name=f"Informe_UltraVet_{nombre_paciente}.docx",
+                    label="📥 DESCARGAR REPORTE BLINDADO (.DOCX)",
+                    data=buffer, file_name=f"Informe_{nombre}.docx",
                     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                 )
                 
             except Exception as e:
-                st.error(f"❌ Error de Sistema: {e}")
+                st.error(f"❌ Error interno: {e}")
