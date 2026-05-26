@@ -11,7 +11,7 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="UltraVET | Informes", page_icon="logo_ultravet.png", layout="centered")
 
 try:
-    API_KEY = st.secrets["AIzaSyDPXKQfhR1UOgVDG2Pbm2jBs7WF2oPCKsg"]
+    API_KEY = st.secrets["GEMINI_API_KEY"]
 except:
     API_KEY = "AIzaSyDPXKQfhR1UOgVDG2Pbm2jBs7WF2oPCKsg"
 
@@ -58,7 +58,7 @@ with st.sidebar:
     else:
         st.error("❌ Faltan Credenciales")
     st.divider()
-    st.markdown("<small>Versión 4.0<br>Ultra Vet © 2026</small>, unsafe_allow_html=True)
+    st.markdown("<small>Versión 4.0 FINAL<br>Blindaje Anti-Alucinaciones © 2026</small>", unsafe_allow_html=True)
 
 st.markdown("<h1 style='text-align: center;'>Panel de Imagenología Móvil</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: #576574;'>Sistema dictatorial de precisión ecográfica.</p>", unsafe_allow_html=True)
@@ -89,7 +89,7 @@ REGLAS ABSOLUTAS INQUEBRANTABLES:
    - Cuando deduzcas diferenciales, usa EXACTAMENTE esta frase base: ", sugerente de "
    - Si es 1 sola patología: ", sugerente de (Patología)."
    - Si son 2 o más patologías: ", sugerente de (1. Patología A 2. Patología B)."
-   - TODO LO QUE ESTÉ DESPUÉS DE "sugerente de" DEBE IR ENCERRADO ENTRE PARÉNTESIS Y EN NEGRILLAS.
+   - TODO LO QUE ESTÉ DESPUÉS DE "sugerente de" DEBE IR ENCERRADO ENTRE PARÉNTESIS.
 
 [FRASES PREDETERMINADAS - COPIADO LITERAL]
 - VEJIGA: Presenta moderado contenido anecoico, sin sedimento, la pared dorsal mide [medida] mm de grosor normal.
