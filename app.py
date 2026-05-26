@@ -58,7 +58,7 @@ with st.sidebar:
     else:
         st.error("❌ Faltan Credenciales")
     st.divider()
-    st.markdown("<small>Versión 4.0 FINAL<br>Blindaje Anti-Alucinaciones © 2026</small>", unsafe_allow_html=True)
+    st.markdown("<small>Versión 4.0<br>UltraVet © 2026</small>", unsafe_allow_html=True)
 
 st.markdown("<h1 style='text-align: center;'>Panel de Imagenología Móvil</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: #576574;'>Sistema dictatorial de precisión ecográfica.</p>", unsafe_allow_html=True)
