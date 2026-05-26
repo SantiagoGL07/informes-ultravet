@@ -11,9 +11,9 @@ import streamlit.components.v1 as components
 st.set_page_config(page_title="UltraVET | Informes", page_icon="logo_ultravet.png", layout="centered")
 
 try:
-    API_KEY = st.secrets["AIzaSyDPXKQfhR1UOgVDG2Pbm2jBs7WF2oPCKsg"]
+    API_KEY = st.secrets["GEMINI_API_KEY"]
 except:
-    API_KEY = "AIzaSyDPXKQfhR1UOgVDG2Pbm2jBs7WF2oPCKsg"
+    API_KEY = ""
 
 # ==========================================
 # 2. ESTILOS Y UI (AESTHETIC)
